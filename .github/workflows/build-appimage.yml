@@ -77,7 +77,7 @@ jobs:
     - name: install target files
       run: |
         make INSTALL_ROOT=appdir install
-        mkdir -p appdir/usr ; cp build/linux/release/product/OpenBoard appdir/usr/openboard
+        mkdir -p appdir/usr/bin ; cp build/linux/release/product/OpenBoard appdir/usr/bin/openboard
         mkdir -p appdir/usr/i18n ; cp resources/i18n/*.qm appdir/usr/i18n/
         cp -r resources/library appdir/usr/
         cp -r resources/etc appdir/usr/
@@ -112,7 +112,7 @@ jobs:
         env LD_LIBRARY_PATH=${Qt5_Dir}/lib QMAKE=${Qt5_Dir}/bin/qmake linuxdeploy-x86_64.AppImage ${STD_OPTS} ${LIBS_FLAG} ${ICON_FLAG} ${DESKTOP} -l ${Qt5_Dir}/lib/libQt5Qml.so.5 -l ${Qt5_Dir}/lib/libQt5Quick.so.5 -l ${Qt5_Dir}/lib/libQt5Sensors.so.5 -l ${Qt5_Dir}/lib/libQt5WebChannel.so.5
         find . -name 'OpenBoard-*-x86_64.AppImage'
       env:
-        STD_OPTS: --plugin=qt --output=appimage --appdir=appdir --executable=appdir/usr/openboard
+        STD_OPTS: --plugin=qt --output=appimage --appdir=appdir
         LIBS_FLAG: -l /usr/lib/x86_64-linux-gnu/libschroedinger-1.0.so.0 -l /usr/lib/x86_64-linux-gnu/libopenjpeg.so.5
         ICON_FLAG: --icon-file=appdir/usr/share/icons/hicolor/256x256/apps/OpenBoard.png
         DESKTOP: --desktop-file=appdir/usr/share/applications/openboard.desktop
