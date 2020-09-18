@@ -19,6 +19,10 @@ jobs:
         repository: 'OpenBoard-org/OpenBoard'
         path: 'OpenBoard'
         ref: ${{ github.ref }}
+    - name: patch OpenBoard
+      run: |
+        patch -p1 -i ../patches/0001-Modify-directory-hierarchy-based-on-FHS.patch
+      working-directory: 'OpenBoard'
     - name: Checkout OpenBoard-ThirdParty
       uses: actions/checkout@v2
       with:
@@ -78,7 +82,7 @@ jobs:
       run: |
         make INSTALL_ROOT=appdir install
         mkdir -p appdir/usr/bin ; cp build/linux/release/product/OpenBoard appdir/usr/bin/openboard
-        mkdir -p appdir/usr/i18n ; cp resources/i18n/*.qm appdir/usr/i18n/
+        mkdir -p appdir/usr/translations ; cp resources/i18n/*.qm appdir/usr/translations/
         cp -r resources/library appdir/usr/
         cp -r resources/etc appdir/usr/
         cp -r resources/linux/openboard-ubz.xml appdir/usr/etc/

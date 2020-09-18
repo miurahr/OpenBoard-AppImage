@@ -1,0 +1,58 @@
+From f28088270fe537be3277745dd40d2e3cd6e114a2 Mon Sep 17 00:00:00 2001
+From: Hiroshi Miura <miurahr@linux.com>
+Date: Fri, 18 Sep 2020 18:16:12 +0900
+Subject: [PATCH] Modify directory hierarchy based on FHS
+
+Signed-off-by: Hiroshi Miura <miurahr@linux.com>
+---
+ src/core/UBOpenSankoreImporter.cpp       | 2 +-
+ src/frameworks/UBPlatformUtils_linux.cpp | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/core/UBOpenSankoreImporter.cpp b/src/core/UBOpenSankoreImporter.cpp
+index b1089ab7..dd5f7fcc 100644
+--- a/src/core/UBOpenSankoreImporter.cpp
++++ b/src/core/UBOpenSankoreImporter.cpp
+@@ -53,7 +53,7 @@ void UBOpenSankoreImporter::onProceedClicked()
+ {
+     QProcess newProcess;
+ #ifdef Q_OS_LINUX
+-    newProcess.startDetached(qApp->applicationDirPath()+"/importer/OpenBoardImporter");
++    newProcess.startDetached(qApp->applicationDirPath()+"/../libexec/OpenBoardImporter");
+ #elif defined Q_OS_OSX
+     newProcess.startDetached(qApp->applicationDirPath()+"/../Resources/OpenBoardImporter.app/Contents/MacOS/OpenBoardImporter");
+ #elif defined Q_OS_WIN
+diff --git a/src/frameworks/UBPlatformUtils_linux.cpp b/src/frameworks/UBPlatformUtils_linux.cpp
+index de5bdb9f..6b6b02d4 100644
+--- a/src/frameworks/UBPlatformUtils_linux.cpp
++++ b/src/frameworks/UBPlatformUtils_linux.cpp
+@@ -45,7 +45,7 @@ void UBPlatformUtils::init()
+ 
+ QString UBPlatformUtils::applicationResourcesDirectory()
+ {
+-    return QApplication::applicationDirPath();
++    return QApplication::applicationDirPath() + "/../";
+ }
+ 
+ void UBPlatformUtils::hideFile(const QString &filePath)
+@@ -74,7 +74,7 @@ void UBPlatformUtils::fadeDisplayIn()
+ 
+ QStringList UBPlatformUtils::availableTranslations()
+ {
+-    QString translationsPath = applicationResourcesDirectory() + "/" + "i18n" + "/";
++    QString translationsPath = applicationResourcesDirectory() + "/" + "translations" + "/";
+     QStringList translationsList = UBFileSystemUtils::allFiles(translationsPath);
+     QRegExp sankoreTranslationFiles(".*OpenBoard_.*.qm");
+     translationsList=translationsList.filter(sankoreTranslationFiles);
+@@ -83,7 +83,7 @@ QStringList UBPlatformUtils::availableTranslations()
+ 
+ QString UBPlatformUtils::translationPath(QString pFilePrefix,QString pLanguage)
+ {
+-    QString qmPath = applicationResourcesDirectory() + "/" + "i18n" + "/" + pFilePrefix + pLanguage + ".qm";
++    QString qmPath = applicationResourcesDirectory() + "/" + "translations" + "/" + pFilePrefix + pLanguage + ".qm";
+     return qmPath;
+ }
+ 
+-- 
+2.25.1
+
