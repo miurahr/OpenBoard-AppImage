@@ -86,7 +86,7 @@ jobs:
         cp -r resources/library appdir/usr/
         cp -r resources/etc appdir/usr/
         cp -r resources/linux/openboard-ubz.xml appdir/usr/etc/
-        mkdir -p appdir/usr/importer ; install ../OpenBoard-Importer/OpenBoardImporter appdir/usr/importer/
+        mkdir -p appdir/usr/libexec ; install ../OpenBoard-Importer/OpenBoardImporter appdir/usr/libexec/
         mkdir -p appdir/usr/customizations ; cp -r resources/customizations/fonts appdir/usr/customizations/fonts
         mkdir -p appdir/usr/share/icons/hicolor/256x256/apps ; convert resources/images/OpenBoard.png -resize 256x256 appdir/usr/share/icons/hicolor/256x256/apps/OpenBoard.png
         mkdir -p appdir/usr/share/icons/hicolor/64x64/apps ; cp resources/images/OpenBoard.png appdir/usr/share/icons/hicolor/64x64/apps/OpenBoard.png
@@ -114,7 +114,6 @@ jobs:
     - name: create AppImage
       run: |
         env LD_LIBRARY_PATH=${Qt5_Dir}/lib QMAKE=${Qt5_Dir}/bin/qmake linuxdeploy-x86_64.AppImage ${STD_OPTS} ${LIBS_FLAG} ${ICON_FLAG} ${DESKTOP} -l ${Qt5_Dir}/lib/libQt5Qml.so.5 -l ${Qt5_Dir}/lib/libQt5Quick.so.5 -l ${Qt5_Dir}/lib/libQt5Sensors.so.5 -l ${Qt5_Dir}/lib/libQt5WebChannel.so.5
-        find . -name 'OpenBoard-*-x86_64.AppImage'
       env:
         STD_OPTS: --plugin=qt --output=appimage --appdir=appdir
         LIBS_FLAG: -l /usr/lib/x86_64-linux-gnu/libschroedinger-1.0.so.0 -l /usr/lib/x86_64-linux-gnu/libopenjpeg.so.5
