@@ -1,0 +1,113 @@
+name: Build AppImage
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-appimage:
+    runs-on: ubuntu-16.04
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set env
+      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF#refs/*/}
+    - name: checkout
+      uses: actions/checkout@v2
+      with:
+        repository: 'OpenBoard-org/OpenBoard'
+        path: 'OpenBoard'
+    - name: checkout thirdparty library
+      uses: actions/checkout@v2
+      with:
+        repository: 'OpenBoard-org/OpenBoard-ThirdParty'
+        path: 'OpenBoard-ThirdParty'
+    - name: checkout qtsolutions
+      uses: actions/checkout@v2
+      with:
+        repository: 'qtproject/qt-solutions'
+        path: 'qt-solutions'
+    - name: install Qt 5.5
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: 5.5
+        host: linux
+        target: desktop
+        modules: all
+    - name: Install linuxdeploy
+      uses: miurahr/install-linuxdeploy-action@v1.2.0
+      with:
+        plugins: qt appimage
+    - name: install dependencies
+      run: |
+        sudo apt-get -y install imagemagick libopenjpeg-dev libschroedinger-dev libssl-dev libmysqlclient-dev libgeoclue-dev libgstreamer0.10-0 libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libavformat-dev libavresample-dev libswscale-dev libavcodec-dev libxt-dev libpaper-dev libva-dev libasound2-dev libsdl1.2-dev libx264-dev libvpx-dev libvorbis-dev libtheora-dev libopus-dev libmp3lame-dev libfdk-aac-dev libass-dev
+        sudo ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/x86_64-linux-gnu/libmysqlclient_r.so
+        sudo ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/x86_64-linux-gnu/libmysqlclient_r.so.16
+        sudo ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libssl.so.10
+        sudo ln -s /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcrypto.so.10
+    - name: build freetype
+      run: |
+        qmake freetype.pro -spec linux-g++
+        make -j$(nproc)
+      working-directory: 'OpenBoard-ThirdParty/freetype'
+    - name: build quazip
+      run: |
+        qmake quazip.pro -spec linux-g++
+        make -j2
+      working-directory: 'OpenBoard-ThirdParty/quazip'
+    - name: build xpdf
+      run: |
+        (cd xpdf-3.04; ./configure --with-freetype2-library="../../freetype/lib/linux" --with-freetype2-includes="../../freetype/freetype-2.6.1/include")
+        qmake xpdf.pro -spec linux-g++
+        make -j2
+      working-directory: 'OpenBoard-ThirdParty/xpdf'
+    - name: build OpenBoard main
+      run: |
+        qmake OpenBoard.pro CONFIG+=release PREFIX=/usr -spec linux-g++-64
+        make -j2
+        lrelease OpenBoard.pro
+        make INSTALL_ROOT=appdir install
+        mkdir -p appdir/usr/translations ; cp resources/i18n/*.qm appdir/usr/translations/
+        mkdir -p appdir/usr/share/icons/hicolor/256x256/apps ; convert resources/images/OpenBoard.png -resize 256x256 appdir/usr/share/icons/hicolor/256x256/apps/OpenBoard.png
+        mkdir -p appdir/usr/share/icons/hicolor/64x64/apps ; cp resources/images/OpenBoard.png appdir/usr/share/icons/hicolor/64x64/apps/OpenBoard.png
+        mkdir appdir/usr/bin ; cp build/linux/release/product/OpenBoard appdir/usr/bin/openboard
+        rm -rf appdir/home/
+      working-directory: 'OpenBoard'
+    - name: prepare desktop file
+      env:
+        APPLICATION_CODE: openboard
+        APPLICATION_SHORTCUT: appdir/usr/share/applications/openboard.desktop
+        APPLICATION_NAME: OpenBoard
+        DESCRIPTION: "OpenBoard, an interactive white board application"
+      run: |
+        mkdir -p appdir/usr/share/applications/
+        echo "[Desktop Entry]" > $APPLICATION_SHORTCUT
+        echo "Version=1.0" >> $APPLICATION_SHORTCUT
+        echo "Name=${APPLICATION_NAME}" >> $APPLICATION_SHORTCUT
+        echo "Comment=$DESCRIPTION" >> $APPLICATION_SHORTCUT
+        echo "Exec=$APPLICATION_CODE %f" >> $APPLICATION_SHORTCUT
+        echo "Icon=${APPLICATION_NAME}" >> $APPLICATION_SHORTCUT
+        echo "StartupNotify=true" >> $APPLICATION_SHORTCUT
+        echo "Terminal=false" >> $APPLICATION_SHORTCUT
+        echo "Type=Application" >> $APPLICATION_SHORTCUT
+        echo "Categories=Education;" >> $APPLICATION_SHORTCUT
+      working-directory: 'OpenBoard'
+    - name: create AppImage
+      run: |
+        env LD_LIBRARY_PATH=${Qt5_Dir}/lib QMAKE=${Qt5_Dir}/bin/qmake linuxdeploy-x86_64.AppImage ${STD_OPTS} ${LIBS_FLAG} ${ICON_FLAG} ${DESKTOP} -l ${Qt5_Dir}/lib/libQt5Qml.so.5 -l ${Qt5_Dir}/lib/libQt5Quick.so.5 -l ${Qt5_Dir}/lib/libQt5Sensors.so.5 -l ${Qt5_Dir}/lib/libQt5WebChannel.so.5
+      env:
+        STD_OPTS: --plugin=qt --output=appimage --appdir=appdir
+        LIBS_FLAG: -l /usr/lib/x86_64-linux-gnu/libschroedinger-1.0.so.0 -l /usr/lib/x86_64-linux-gnu/libopenjpeg.so.5
+        ICON_FLAG: --icon-file=appdir/usr/share/icons/hicolor/256x256/apps/OpenBoard.png
+        DESKTOP: --desktop-file=appdir/usr/share/applications/openboard.desktop
+      working-directory: 'OpenBoard'
+    - name: Collect artifacts
+      run: |
+        mkdir -p ${{runner.workspace}}/artifacts
+        mv *.AppImage ${{runner.workspace}}/artifacts
+      working-directory: 'OpenBoard'
+    - uses: actions/upload-artifact@v1
+      with:
+        name: AppImage
+        path: ${{runner.workspace}}/artifacts
+
