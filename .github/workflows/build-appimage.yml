@@ -24,6 +24,11 @@ jobs:
       with:
         repository: 'OpenBoard-org/OpenBoard-ThirdParty'
         path: 'OpenBoard-ThirdParty'
+    - name: Checkout OpenBoard-Importer
+      uses: actions/checkout@v2
+      with:
+        repository: 'OpenBoard-org/OpenBoard-Importer'
+        path: 'OpenBoard-Importer'
     - name: install Qt 5.5
       uses: jurplel/install-qt-action@v2
       with:
@@ -58,17 +63,30 @@ jobs:
         qmake xpdf.pro -spec linux-g++
         make -j2
       working-directory: 'OpenBoard-ThirdParty/xpdf'
+    - name: build OpenBoard-Importer
+      run: |
+        qmake OpenBoardImporter.pro
+        make -j2
+      working-directory: 'OpenBoard-Importer'
     - name: build OpenBoard main
       run: |
         qmake OpenBoard.pro CONFIG+=release PREFIX=/usr -spec linux-g++-64
         make -j2
         lrelease OpenBoard.pro
+      working-directory: 'OpenBoard'
+    - name: install target files
+      run: |
         make INSTALL_ROOT=appdir install
-        mkdir -p appdir/usr/translations ; cp resources/i18n/*.qm appdir/usr/translations/
+        mkdir -p appdir/usr ; cp build/linux/release/product/OpenBoard appdir/usr/openboard
+        mkdir -p appdir/usr/i18n ; cp resources/i18n/*.qm appdir/usr/i18n/
+        cp -r resources/library appdir/usr/
+        cp -r resources/etc appdir/usr/
+        cp -r resources/linux/openboard-ubz.xml appdir/usr/etc/
+        mkdir -p appdir/usr/importer ; install ../OpenBoard-Importer/OpenBoardImporter appdir/usr/importer/
+        mkdir -p appdir/usr/customizations ; cp -r resources/customizations/fonts appdir/usr/customizations/fonts
         mkdir -p appdir/usr/share/icons/hicolor/256x256/apps ; convert resources/images/OpenBoard.png -resize 256x256 appdir/usr/share/icons/hicolor/256x256/apps/OpenBoard.png
         mkdir -p appdir/usr/share/icons/hicolor/64x64/apps ; cp resources/images/OpenBoard.png appdir/usr/share/icons/hicolor/64x64/apps/OpenBoard.png
-        mkdir appdir/usr/bin ; cp build/linux/release/product/OpenBoard appdir/usr/bin/openboard
-        rm -rf appdir/home/
+        rm -rf appdir/home
       working-directory: 'OpenBoard'
     - name: prepare desktop file
       env:
@@ -94,7 +112,7 @@ jobs:
         env LD_LIBRARY_PATH=${Qt5_Dir}/lib QMAKE=${Qt5_Dir}/bin/qmake linuxdeploy-x86_64.AppImage ${STD_OPTS} ${LIBS_FLAG} ${ICON_FLAG} ${DESKTOP} -l ${Qt5_Dir}/lib/libQt5Qml.so.5 -l ${Qt5_Dir}/lib/libQt5Quick.so.5 -l ${Qt5_Dir}/lib/libQt5Sensors.so.5 -l ${Qt5_Dir}/lib/libQt5WebChannel.so.5
         find . -name 'OpenBoard-*-x86_64.AppImage'
       env:
-        STD_OPTS: --plugin=qt --output=appimage --appdir=appdir
+        STD_OPTS: --plugin=qt --output=appimage --appdir=appdir --executable=appdir/usr/openboard
         LIBS_FLAG: -l /usr/lib/x86_64-linux-gnu/libschroedinger-1.0.so.0 -l /usr/lib/x86_64-linux-gnu/libopenjpeg.so.5
         ICON_FLAG: --icon-file=appdir/usr/share/icons/hicolor/256x256/apps/OpenBoard.png
         DESKTOP: --desktop-file=appdir/usr/share/applications/openboard.desktop
