@@ -65,8 +65,8 @@ jobs:
       working-directory: 'OpenBoard-ThirdParty/xpdf'
     - name: build OpenBoard-Importer
       run: |
-        qmake OpenBoardImporter.pro
-        make -j2
+        qmake OpenBoardImporter.pro CONFIG+=release PREFIX=/usr -spec linux-g++-64
+        env LD_LIBRARY_PATH=${Qt5_Dir}/lib:${LD_LIBRARY_PATH} make -j2
       working-directory: 'OpenBoard-Importer'
     - name: build OpenBoard main
       run: |
