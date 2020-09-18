@@ -9,14 +9,17 @@ jobs:
   build-appimage:
     runs-on: ubuntu-16.04
     steps:
-    - uses: actions/checkout@v2
-    - name: checkout
+    - uses: actions/checkout@v1
+    - name: Detect release tag
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+    - name: Checkout OpenBoard
       uses: actions/checkout@v2
       with:
         repository: 'OpenBoard-org/OpenBoard'
         path: 'OpenBoard'
         ref: ${{ github.ref }}
-    - name: checkout thirdparty library
+    - name: Checkout OpenBoard-ThirdParty
       uses: actions/checkout@v2
       with:
         repository: 'OpenBoard-org/OpenBoard-ThirdParty'
@@ -95,7 +98,7 @@ jobs:
         LIBS_FLAG: -l /usr/lib/x86_64-linux-gnu/libschroedinger-1.0.so.0 -l /usr/lib/x86_64-linux-gnu/libopenjpeg.so.5
         ICON_FLAG: --icon-file=appdir/usr/share/icons/hicolor/256x256/apps/OpenBoard.png
         DESKTOP: --desktop-file=appdir/usr/share/applications/openboard.desktop
-        OUTPUT: OpenBoard-${{ github.ref }}-x86_64.AppImage
+        OUTPUT: OpenBoard-${{ steps.vars.outputs.tag }}-x86_64.AppImage
       working-directory: 'OpenBoard'
     - name: Create Release
       id: create_release
@@ -114,7 +117,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/OpenBoard/OpenBoard-${{ github.ref }}-x86_64.AppImage
-        asset_name: OpenBoard-${{ github.ref }}-x86_64.AppImage
+        asset_path: ${{ github.workspace }}/OpenBoard/OpenBoard-${{ steps.vars.outputs.tag }}-x86_64.AppImage
+        asset_name: OpenBoard-${{ steps.vars.outputs.tag }}-x86_64.AppImage
         asset_content_type: application/x-executable
 
