@@ -1,4 +1,4 @@
-name: Build AppImage
+name: Build AppImage release
 
 on:
   push:
@@ -15,16 +15,12 @@ jobs:
       with:
         repository: 'OpenBoard-org/OpenBoard'
         path: 'OpenBoard'
+        ref: ${{ github.ref }}
     - name: checkout thirdparty library
       uses: actions/checkout@v2
       with:
         repository: 'OpenBoard-org/OpenBoard-ThirdParty'
         path: 'OpenBoard-ThirdParty'
-    - name: checkout qtsolutions
-      uses: actions/checkout@v2
-      with:
-        repository: 'qtproject/qt-solutions'
-        path: 'qt-solutions'
     - name: install Qt 5.5
       uses: jurplel/install-qt-action@v2
       with:
