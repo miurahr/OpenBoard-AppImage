@@ -46,7 +46,7 @@ jobs:
         plugins: qt appimage
     - name: install dependencies
       run: |
-        sudo apt-get -y install imagemagick libopenjpeg-dev libschroedinger-dev libssl-dev libmysqlclient-dev libgeoclue-dev libgstreamer0.10-0 libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libavformat-dev libavresample-dev libswscale-dev libavcodec-dev libxt-dev libpaper-dev libva-dev libasound2-dev libsdl1.2-dev libx264-dev libvpx-dev libvorbis-dev libtheora-dev libopus-dev libmp3lame-dev libfdk-aac-dev libass-dev
+        sudo apt-get -y install imagemagick libopenjpeg-dev libschroedinger-dev libssl-dev libmysqlclient-dev libgeoclue-dev libgstreamer0.10-0 libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libavformat-dev libavresample-dev libswscale-dev libavcodec-dev libxt-dev libpaper-dev libva-dev libasound2-dev libsdl1.2-dev libx264-dev libvpx-dev libvorbis-dev libtheora-dev libopus-dev libmp3lame-dev libfdk-aac-dev libass-dev libcrystalhd-dev
         sudo ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/x86_64-linux-gnu/libmysqlclient_r.so
         sudo ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/x86_64-linux-gnu/libmysqlclient_r.so.16
         sudo ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libssl.so.10
@@ -116,7 +116,7 @@ jobs:
         env LD_LIBRARY_PATH=${Qt5_Dir}/lib QMAKE=${Qt5_Dir}/bin/qmake linuxdeploy-x86_64.AppImage ${STD_OPTS} ${LIBS_FLAG} ${ICON_FLAG} ${DESKTOP} -l ${Qt5_Dir}/lib/libQt5Qml.so.5 -l ${Qt5_Dir}/lib/libQt5Quick.so.5 -l ${Qt5_Dir}/lib/libQt5Sensors.so.5 -l ${Qt5_Dir}/lib/libQt5WebChannel.so.5
       env:
         STD_OPTS: --plugin=qt --output=appimage --appdir=appdir
-        LIBS_FLAG: -l /usr/lib/x86_64-linux-gnu/libschroedinger-1.0.so.0 -l /usr/lib/x86_64-linux-gnu/libopenjpeg.so.5
+        LIBS_FLAG: -l /usr/lib/x86_64-linux-gnu/libschroedinger-1.0.so.0 -l /usr/lib/x86_64-linux-gnu/libopenjpeg.so.5 -l /usr/lib/x86_64-linux-gnu/libcrystalhd.so.3
         ICON_FLAG: --icon-file=appdir/usr/share/icons/hicolor/256x256/apps/OpenBoard.png
         DESKTOP: --desktop-file=appdir/usr/share/applications/openboard.desktop
         OUTPUT: OpenBoard-${{ steps.vars.outputs.tag }}-x86_64.AppImage
