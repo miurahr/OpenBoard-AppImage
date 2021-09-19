@@ -50,6 +50,7 @@ jobs:
         sudo apt-get -y install libgl1-mesa-dev libfontconfig1 libssl-dev libpoppler-dev libpoppler-cpp-dev libpoppler-private-dev libavcodec-dev libavformat-dev libswscale-dev libpaper-dev  libva-dev libxcb-shm0-dev libasound2-dev libx264-dev libvpx-dev libvorbis-dev  libtheora-dev libmp3lame-dev libsdl1.2-dev libopus-dev  libfdk-aac-dev libass-dev liblzma-dev libbz2-dev
         sudo apt-get -y install libquazip5-dev
         sudo apt-get -y install libxcb-shape0-dev libxcb-xfixes0-dev
+        sudo apt-get -y install  libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
     - name: build OpenBoard-Importer
       run: |
         qmake OpenBoardImporter.pro CONFIG+=release PREFIX=/usr -spec linux-g++-64
