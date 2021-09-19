@@ -37,7 +37,7 @@ jobs:
         target: desktop
         modules: all
     - name: Install linuxdeploy
-      uses: miurahr/install-linuxdeploy-action@v1.2.0
+      uses: miurahr/install-linuxdeploy-action@v1.5.1
       with:
         plugins: qt appimage
     - name: install dependencies
