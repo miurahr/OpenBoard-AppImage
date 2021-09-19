@@ -109,7 +109,8 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: release-files
-        path: OpenBoard
+        path: OpenBoard/OpenBoard-${{ steps.vars.outputs.tag }}-x86_64.AppImage
+
 
   release:
     name: publish on github release
@@ -142,7 +143,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: OpenBoard/OpenBoard-${{ steps.vars.outputs.tag }}-x86_64.AppImage
+        file: OpenBoard-${{ steps.vars.outputs.tag }}-x86_64.AppImage
         tag: ${{ github.ref }}
         overwrite: true
 
