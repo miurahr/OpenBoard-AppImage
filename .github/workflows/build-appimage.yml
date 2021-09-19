@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-appimage:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v1
     - name: Detect release tag
@@ -23,20 +23,15 @@ jobs:
       run: |
         patch -p1 -i ../patches/0001-Modify-directory-hierarchy-based-on-FHS.patch
       working-directory: 'OpenBoard'
-    - name: Checkout OpenBoard-ThirdParty
-      uses: actions/checkout@v2
-      with:
-        repository: 'OpenBoard-org/OpenBoard-ThirdParty'
-        path: 'OpenBoard-ThirdParty'
     - name: Checkout OpenBoard-Importer
       uses: actions/checkout@v2
       with:
         repository: 'OpenBoard-org/OpenBoard-Importer'
         path: 'OpenBoard-Importer'
-    - name: install Qt 5.5
+    - name: install Qt 5.15.2
       uses: jurplel/install-qt-action@v2
       with:
-        version: 5.5
+        version: 5.15.2
         host: linux
         target: desktop
         modules: all
@@ -46,27 +41,9 @@ jobs:
         plugins: qt appimage
     - name: install dependencies
       run: |
-        sudo apt-get -y install imagemagick libopenjpeg-dev libschroedinger-dev libssl-dev libmysqlclient-dev libgeoclue-dev libgstreamer0.10-0 libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev libavformat-dev libavresample-dev libswscale-dev libavcodec-dev libxt-dev libpaper-dev libva-dev libasound2-dev libsdl1.2-dev libx264-dev libvpx-dev libvorbis-dev libtheora-dev libopus-dev libmp3lame-dev libfdk-aac-dev libass-dev libcrystalhd-dev
-        sudo ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/x86_64-linux-gnu/libmysqlclient_r.so
-        sudo ln -s /usr/lib/x86_64-linux-gnu/libmysqlclient.so /usr/lib/x86_64-linux-gnu/libmysqlclient_r.so.16
-        sudo ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libssl.so.10
-        sudo ln -s /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcrypto.so.10
-    - name: build freetype
-      run: |
-        qmake freetype.pro -spec linux-g++
-        make -j$(nproc)
-      working-directory: 'OpenBoard-ThirdParty/freetype'
-    - name: build quazip
-      run: |
-        qmake quazip.pro -spec linux-g++
-        make -j2
-      working-directory: 'OpenBoard-ThirdParty/quazip'
-    - name: build xpdf
-      run: |
-        (cd xpdf-3.04; ./configure --with-freetype2-library="../../freetype/lib/linux" --with-freetype2-includes="../../freetype/freetype-2.6.1/include")
-        qmake xpdf.pro -spec linux-g++
-        make -j2
-      working-directory: 'OpenBoard-ThirdParty/xpdf'
+        sudo apt-get -y install libgl1-mesa-dev libfontconfig1 libssl-dev libpoppler-dev libpoppler-cpp-dev libpoppler-private-dev libavcodec-dev libavformat-dev libswscale-dev libpaper-dev  libva-dev libxcb-shm0-dev libasound2-dev libx264-dev libvpx-dev libvorbis-dev  libtheora-dev libmp3lame-dev libsdl1.2-dev libopus-dev  libfdk-aac-dev libass-dev liblzma-dev libbz2-dev
+        sudo apt-get -y install libquazip5-dev
+        sudo apt-get -y install libxcb-shape0-dev libxcb-xfixes0-dev
     - name: build OpenBoard-Importer
       run: |
         qmake OpenBoardImporter.pro CONFIG+=release PREFIX=/usr -spec linux-g++-64
