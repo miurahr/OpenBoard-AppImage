@@ -38,9 +38,9 @@ jobs:
         modules: all
     - name: Install qtwebkit
       run: |
+        cd ${Qt5_Dir}
         wget https://download.qt.io/snapshots/ci/qtwebkit/5.212/latest/qtwebkit/qtwebkit-Linux-RHEL_7_6-GCC-Linux-RHEL_7_6-X86_64.7z
-        cd Qt/5.15.2/gcc_64/
-        7z x ../../../qtwebkit-Linux-RHEL_7_6-GCC-Linux-RHEL_7_6-X86_64.7z
+        7z x qtwebkit-Linux-RHEL_7_6-GCC-Linux-RHEL_7_6-X86_64.7z
     - name: Install linuxdeploy
       uses: miurahr/install-linuxdeploy-action@v1.5.1
       with:
